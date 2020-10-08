@@ -13,11 +13,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - id: compile
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - run: ./.github/actions/action.yml
+      - id: compile
+        run: ./.github/actions/action.yml
       - run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
