@@ -13,15 +13,15 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
       - run: npm install @actions/core
       - run: npm install @actions/github
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
 
       - id: compile
         name: Forward output
-        uses: ./.github/actions/action.yml
+        uses: ./.github/actions
       - run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
