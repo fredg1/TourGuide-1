@@ -15,15 +15,19 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-      - run: npm init -y
-      - run: npm install @actions/core
-      - run: npm install @actions/github
+      #- uses: actions/setup-node@v1
+      #- run: npm init -y
+      #- run: npm install @actions/core
+      #- run: npm install @actions/github
 
       - id: compile
         name: Forward output
-        uses: ./.github/actions
-      - run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
+        #uses: ./.github/actions
+        shell: python
+        run: |
+          import glob
+          print(os.environ['PATH'])
+      #- run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
     #runs-on: windows-lastest
