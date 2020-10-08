@@ -16,7 +16,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - run: dir
+      - run: ./.github/actions/action.yml
+      - run: echo $compiled_output $GITHUB_WORKSPACE
   #push_to_branch:
     #needs: build
     #runs-on: windows-lastest
