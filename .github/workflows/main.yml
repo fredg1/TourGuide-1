@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: ./.github/actions/action.yml
-      - run: echo $compiled_output $GITHUB_WORKSPACE
+      - run: echo %compiled_output% %GITHUB_WORKSPACE%
   #push_to_branch:
     #needs: build
     #runs-on: windows-lastest
