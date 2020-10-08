@@ -8,4 +8,4 @@ outputs:
 
 runs:
   using: 'node12'
-  main: '.github/scripts/Compile_ASH_script.js'
+  main: 'Compile_ASH_script.js'
