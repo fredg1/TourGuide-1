@@ -8,4 +8,4 @@ outputs:
 
 runs:
   using: JavaScript
-  main: Compile_ASH_script.js
+  main: .github/scripts/Compile_ASH_script.js
