@@ -21,7 +21,7 @@ jobs:
 
       - id: compile
         name: Forward output
-        run: ./.github/actions/action.yml
+        uses: ./.github/actions/action.yml
       - run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
