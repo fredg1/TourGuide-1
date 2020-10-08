@@ -25,6 +25,7 @@ jobs:
         #uses: ./.github/actions
         shell: python
         run: |
+          import os
           import glob
           print(os.environ['PATH'])
       #- run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
