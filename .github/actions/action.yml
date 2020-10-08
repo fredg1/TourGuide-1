@@ -7,5 +7,5 @@ outputs:
     description: 'The resulting content of the soon-to-be compiled TourGuide.'
 
 runs:
-  using: JavaScript
-  main: .github/scripts/Compile_ASH_script.js
+  using: 'node12'
+  main: '.github/scripts/Compile_ASH_script.js'
