@@ -26,7 +26,8 @@ jobs:
         shell: python
         run: |
           import os
-          import glob
+          while '.github' in os.getcwd(): os.chdir('..')
+          from from pathlib import Path
           print(os.environ['PATH'])
       #- run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
