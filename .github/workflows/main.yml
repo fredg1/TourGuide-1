@@ -26,9 +26,11 @@ jobs:
         shell: python
         run: |
           import os
+          # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
-          from from pathlib import Path
-          print(os.environ['PATH'])
+          
+          # The script that compiles the target script. First argument is the target script. Second argument (optional) is the path to reach the "mafia folder".
+          py Compile_ASH_script.compile('relay/relay_TourGuide.ash', 'Source/')
       #- run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
