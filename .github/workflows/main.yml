@@ -1,4 +1,4 @@
-name: compile Guide
+name: bundle Guide
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
       #- run: npm install @actions/core
       #- run: npm install @actions/github
 
-      - id: compile
+      - id: bundle
         name: Forward output
         #uses: ./.github/actions
         shell: python
@@ -29,9 +29,9 @@ jobs:
           # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
           
-          # The script that compiles the target script. First argument is the target script. Second argument (optional) is the path to reach the "mafia folder".
-          py Compile_ASH_script.compile('relay/relay_TourGuide.ash', 'Source/')
-      #- run: echo "The time was ${{ steps.compile.outputs.compiled_output }}"
+          # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
+          py Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'Bundled_TourGuide.ash', 'Source')
+      #- run: echo "The time was ${{ steps.bundle.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
     #runs-on: windows-lastest
