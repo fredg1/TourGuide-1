@@ -31,11 +31,15 @@ jobs:
         shell: python
         run: |
           import os
+          # Get out of the '.github' folder
+          while '.github' in os.getcwd(): os.chdir('..')
+          
+          print(os.environ['PYTHONPATH'])
+          os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ';' + os.getcwd()
+          print(os.environ['PYTHONPATH'])
           print("current dir: " + os.getcwd())
           print(os.listdir())
           import Bundle_ASH_script
-          # Get out of the '.github' folder
-          # while '.github' in os.getcwd(): os.chdir('..')
           
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
           Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'Bundled_TourGuide.ash', 'Source')
