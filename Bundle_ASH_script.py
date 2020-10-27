@@ -34,6 +34,9 @@ import os
 #       bundle_and_write( 'scripts/my_script.ash' , 'Sekrits/my_bundled_script.ash' , 'Games/Actually_entertaining_games/KoLMafia/' )
 #   and then run, in the command line:
 #       C:\Users\Me\Desktop>  py Bundle_ASH_script
+#
+#
+#  bundle_and_write('relay/relay_TourGuide.ash', 'test.ash', 'Source')
 
 debug = False
 
@@ -177,6 +180,3 @@ def bundle_and_write(path_to_file,path_to_result,path_to_folder = ''):
       path_to_folder += '/'
 
     bundled_file.write( bundle(path_to_file,path_to_folder) )
-
-
-bundle_and_write('relay/relay_TourGuide.ash', 'test.ash', 'Source')
