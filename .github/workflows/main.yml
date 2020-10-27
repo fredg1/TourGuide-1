@@ -29,6 +29,7 @@ jobs:
           # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
           
+          import Bundle_ASH_script
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
           Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'Bundled_TourGuide.ash', 'Source')
       #- run: echo "The time was ${{ steps.bundle.outputs.compiled_output }}"
