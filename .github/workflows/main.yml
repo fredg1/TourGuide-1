@@ -34,9 +34,7 @@ jobs:
           # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
           
-          print(os.environ['PYTHONPATH'])
-          os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'] + ';' + os.getcwd()
-          print(os.environ['PYTHONPATH'])
+          sys.path.append(os.getcwd())
           print("current dir: " + os.getcwd())
           print(os.listdir())
           import Bundle_ASH_script
