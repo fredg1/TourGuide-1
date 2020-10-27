@@ -29,7 +29,7 @@ jobs:
           # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
           print("current dir: " + os.getcwd())
-          print("content: " + os.listdir())
+          print(os.listdir())
           
           import Bundle_ASH_script
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
