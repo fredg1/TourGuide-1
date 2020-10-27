@@ -27,6 +27,8 @@ jobs:
         run: |
           import os
           import Bundle_ASH_script
+          print("current dir: " + os.getcwd())
+          print(os.listdir())
           # Get out of the '.github' folder
           while '.github' in os.getcwd(): os.chdir('..')
           
