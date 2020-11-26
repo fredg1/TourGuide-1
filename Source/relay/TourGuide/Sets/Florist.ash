@@ -1,4 +1,4 @@
-import "relay/TourGuide/Plants.ash";
+import "relay/TourGuide_wc/Plants.ash";
 
 RegisterTaskGenerationFunction("SFloristGenerateTasks");
 void SFloristGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)

@@ -1,6 +1,6 @@
 
-import "relay/TourGuide/Support/Checklist.ash";
-import "relay/TourGuide/Sets/Sets import.ash";
+import "relay/TourGuide_wc/Support/Checklist.ash";
+import "relay/TourGuide_wc/Sets/Sets import.ash";
 
 void SetsInit()
 {

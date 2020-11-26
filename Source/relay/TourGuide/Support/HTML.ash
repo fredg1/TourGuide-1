@@ -1,4 +1,4 @@
-import "relay/TourGuide/Support/List.ash"
+import "relay/TourGuide_wc/Support/List.ash"
 
 
 float __setting_indention_width_in_em = 1.45;

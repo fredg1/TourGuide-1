@@ -1,6 +1,6 @@
-import "relay/TourGuide/Support/Spell Damage.ash"
-import "relay/TourGuide/Support/Passive Damage.ash"
-import "relay/TourGuide/Support/Item Filter.ash"
+import "relay/TourGuide_wc/Support/Spell Damage.ash"
+import "relay/TourGuide_wc/Support/Passive Damage.ash"
+import "relay/TourGuide_wc/Support/Item Filter.ash"
 
 
 Record TFWMInternalModifier

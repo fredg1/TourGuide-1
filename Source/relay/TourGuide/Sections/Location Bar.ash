@@ -1,4 +1,4 @@
-import "relay/TourGuide/Sections/Location Bar Popup.ash";
+import "relay/TourGuide_wc/Sections/Location Bar Popup.ash";
 
 buffer generateLocationBar(boolean displaying_navbar)
 {

@@ -1,5 +1,5 @@
 
-import "relay/TourGuide/Limit Mode/Batfellow State.ash";
+import "relay/TourGuide_wc/Limit Mode/Batfellow State.ash";
 
 
 void LimitModeBatfellowGenerateResources(ChecklistEntry [int] resource_entries, BatState state)

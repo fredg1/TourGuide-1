@@ -1,5 +1,5 @@
-import "relay/TourGuide/Support/Counter.ash"
-import "relay/TourGuide/Support/Holiday.ash"
+import "relay/TourGuide_wc/Support/Counter.ash"
+import "relay/TourGuide_wc/Support/Holiday.ash"
 
 
                 

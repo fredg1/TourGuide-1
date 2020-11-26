@@ -1,4 +1,4 @@
-import "relay/TourGuide/Quests/Level 11.ash";
+import "relay/TourGuide_wc/Quests/Level 11.ash";
 
 void QPirateInit()
 {

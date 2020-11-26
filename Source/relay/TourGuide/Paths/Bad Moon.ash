@@ -1,6 +1,6 @@
 
-import "relay/TourGuide/QuestState.ash"
-import "relay/TourGuide/Support/LocationAvailable.ash"
+import "relay/TourGuide_wc/QuestState.ash"
+import "relay/TourGuide_wc/Support/LocationAvailable.ash"
 
 Record BadMoonAdventure
 {

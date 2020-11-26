@@ -1,4 +1,4 @@
-import "relay/TourGuide/Sets/Copied Monsters.ash" //A quaint and curious import.
+import "relay/TourGuide_wc/Sets/Copied Monsters.ash" //A quaint and curious import.
 
 void QLevel8Init()
 {

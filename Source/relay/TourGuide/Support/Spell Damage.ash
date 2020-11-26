@@ -1,4 +1,4 @@
-import "relay/TourGuide/Support/Math.ash";
+import "relay/TourGuide_wc/Support/Math.ash";
 
 effect [element] __flavour_lookup;
 __flavour_lookup[$element[hot]] = $effect[Spirit of Cayenne];

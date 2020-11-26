@@ -1,5 +1,5 @@
-import "relay/TourGuide/Sections/Tests.ash"
-import "relay/TourGuide/Limit Mode/Batfellow.ash";
+import "relay/TourGuide_wc/Sections/Tests.ash"
+import "relay/TourGuide_wc/Limit Mode/Batfellow.ash";
 
 void generateMisc(Checklist [int] checklists)
 {

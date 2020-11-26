@@ -1,7 +1,7 @@
-import "relay/TourGuide/Support/Math.ash"
-import "relay/TourGuide/Support/List.ash"
-import "relay/TourGuide/Support/Strings.ash"
-import "relay/TourGuide/Support/Statics.ash"
+import "relay/TourGuide_wc/Support/Math.ash"
+import "relay/TourGuide_wc/Support/List.ash"
+import "relay/TourGuide_wc/Support/Strings.ash"
+import "relay/TourGuide_wc/Support/Statics.ash"
 
 boolean mafiaIsPastRevision(int revision_number)
 {

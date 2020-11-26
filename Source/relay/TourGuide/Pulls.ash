@@ -1,5 +1,5 @@
-import "relay/TourGuide/QuestState.ash"
-import "relay/TourGuide/Support/Checklist.ash"
+import "relay/TourGuide_wc/QuestState.ash"
+import "relay/TourGuide_wc/Support/Checklist.ash"
 
 boolean [item] __pulls_reasonable_to_buy_in_run;
 
