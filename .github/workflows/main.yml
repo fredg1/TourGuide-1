@@ -20,22 +20,28 @@ env:
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
 
 jobs:
+  # This is a pain...
   Set_target_branch:
     runs-on: windows-latest
     outputs:
-      target_name: ${{ fromJSON( steps.set-name.outputs.target )[env.USE_DYNAMIC_TARGET_NAME] }}
+      target_name: ${{ steps.set-name.outputs.target }}
     steps:
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
         
+      - id: set-name-object
+        run: echo "::set-output name=json_string::{false:${{ env.STATIC_TARGET_NAME }},true:${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}}"
+        
       - id: set-name
-        run: echo "::set-output name=target::{false:${{env.STATIC_TARGET_NAME}},true:${{format(env.DYNAMIC_TARGET_NAME,env.BRANCH_NAME)}}}"
+        env:
+          JSON_object: ${{ fromJSON( steps.set-name-object.outputs.json_string ) }}
+        run: echo "::set-output name=target::${{ env.JSON_object[env.USE_DYNAMIC_TARGET_NAME] }}"
         
   build:
     needs: Set_target_branch
     runs-on: windows-latest
     env:
-      TARGET_BRANCH_NAME: ${{needs.Set_target_branch.outputs.target_name}}
+      TARGET_BRANCH_NAME: ${{ needs.Set_target_branch.outputs.target_name }}
 
     steps:
       - name: setup Python
@@ -49,7 +55,7 @@ jobs:
       - name: checkout target branch
         uses: actions/checkout@v2
         with:
-          ref: ${{env.TARGET_BRANCH_NAME}}
+          ref: ${{ env.TARGET_BRANCH_NAME }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
