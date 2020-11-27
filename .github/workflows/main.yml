@@ -49,7 +49,7 @@ jobs:
       - name: checkout target branch
         uses: actions/checkout@v2
         with:
-          ref: $TARGET_BRANCH_NAME
+          ref: ${{TARGET_BRANCH_NAME}}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
