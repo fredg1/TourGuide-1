@@ -13,9 +13,9 @@ on:
       - 'Source/relay/**.js'
 
 env:
-  # To have the branch name depend on the ref's name, set USE_STATIC_TARGET_NAME to 'true', and (if you want) modify the end of line 37
+  # To have the branch name depend on the ref's name instead, set USE_STATIC_TARGET_NAME to 'true', and (if you want) modify the end of line 36
   TARGET_BRANCH_NAME: Pre-Release
-  USE_STATIC_TARGET_NAME: true
+  USE_DYNAMIC_TARGET_NAME: true
 
 jobs:
   build:
@@ -31,11 +31,10 @@ jobs:
       # /  target branch         /
       # //////////////////////////
       
-      - name: set target branch name
-        id: target_name
+      - name: set dynamic target branch name
         # "${{env.TARGET_BRANCH_NAME}}" is the name of the original branch
-        run: echo '::set-output name=TARGET_BRANCH_NAME::Bundled_${{env.TARGET_BRANCH_NAME}}'
-        if: ${{env.USE_STATIC_TARGET_NAME}}
+        run: echo "TARGET_BRANCH_NAME=Bundled-${{env.TARGET_BRANCH_NAME}}" >> $GITHUB_ENV
+        if: ${{env.USE_DYNAMIC_TARGET_NAME}}
       
       
       - name: setup Python
