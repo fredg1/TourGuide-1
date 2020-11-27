@@ -13,9 +13,10 @@ on:
       - 'Source/relay/**.js'
 
 env:
-  # To have the branch name depend on the ref's name instead, set USE_STATIC_TARGET_NAME to 'true', and (if you want) modify the end of line 36
-  TARGET_BRANCH_NAME: Pre-Release
+  # To have the branch name depend on the origin branch or tag's name instead, set USE_DYNAMIC_TARGET_NAME to 'true', and (if you want) modify the end of line 36
+  BRANCH_NAME: Pre-Release
   USE_DYNAMIC_TARGET_NAME: true
+  DYNAMIC_TARGET_NAME: Bundled-${{env.BRANCH_NAME}}
 
 jobs:
   build:
@@ -24,6 +25,7 @@ jobs:
     steps:
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
+        if: ${{env.USE_DYNAMIC_TARGET_NAME}}
       
       # //////////////////////////
       # /  Change this to modify /
@@ -33,7 +35,7 @@ jobs:
       
       - name: set dynamic target branch name
         # "${{env.TARGET_BRANCH_NAME}}" is the name of the original branch
-        run: echo "TARGET_BRANCH_NAME=Bundled-${{env.TARGET_BRANCH_NAME}}" >> $GITHUB_ENV
+        run: echo "NEW_TARGET_BRANCH_NAME=Bundled-${{env.BRANCH_NAME}}" >> $GITHUB_ENV
         if: ${{env.USE_DYNAMIC_TARGET_NAME}}
       
       
