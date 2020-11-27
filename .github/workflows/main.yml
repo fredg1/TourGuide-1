@@ -20,53 +20,41 @@ env:
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
 
 jobs:
-  # This is a pain...
-  Set_target_branch:
-    runs-on: windows-latest
-    outputs:
-      target_name: ${{ steps.set-name.outputs.target }}
-    steps:
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-        
-      - id: set-name-object
-        run: echo "::set-output name=json_string::{"false":${{ env.STATIC_TARGET_NAME }},"true":${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}}"
-      - name: test
-        env:
-          JSON_object: ${{ fromJSON( steps.set-name-object.outputs.json_string ) }}
-        run: echo "${{ env.JSON_object }}"
-        
-      - id: set-name
-        env:
-          JSON_object: ${{ fromJSON( steps.set-name-object.outputs.json_string ) }}
-        run: echo "::set-output name=target::${{ env.JSON_object[env.USE_DYNAMIC_TARGET_NAME] }}"
-        
   build:
-    needs: Set_target_branch
     runs-on: windows-latest
-    env:
-      TARGET_BRANCH_NAME: ${{ needs.Set_target_branch.outputs.target_name }}
 
     steps:
       - name: setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-          
+        
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+        
       - name: checkout current branch
         uses: actions/checkout@v2
         
-      - name: checkout target branch
+      - name: checkout target branch static
         uses: actions/checkout@v2
         with:
-          ref: ${{ env.TARGET_BRANCH_NAME }}
+          ref: ${{ env.STATIC_TARGET_NAME }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
+        if: ${{ !env.USE_DYNAMIC_TARGET_NAME }}
+      - name: checkout target branch dynamic
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME }}
         
       - name: more info
         run: |
-          echo $GITHUB_WORKSPACE
+          echo "$GITHUB_WORKSPACE"
         
       - name: Forward output
         shell: python
