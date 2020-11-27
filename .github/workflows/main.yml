@@ -13,31 +13,31 @@ on:
       - 'Source/relay/**.js'
 
 env:
-  # To have the branch name depend on the origin branch or tag's name instead, set USE_DYNAMIC_TARGET_NAME to 'true', and (if you want) modify the end of line 36
-  BRANCH_NAME: Pre-Release
+  # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
   USE_DYNAMIC_TARGET_NAME: true
+  STATIC_TARGET_NAME: Pre-Release
+  # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
+  DYNAMIC_TARGET_NAME: 'Bundled-{0}'
 
 jobs:
-  build:
+  Set_target_branch:
     runs-on: windows-latest
-
+    outputs:
+      target_name: ${{ steps.set-name.outputs.target }}.${{env.USE_DYNAMIC_TARGET_NAME}}
     steps:
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
-        if: ${{env.USE_DYNAMIC_TARGET_NAME}}
-      
-      # //////////////////////////
-      # /  Change this to modify /
-      # /  the name of the       /
-      # /  target branch         /
-      # //////////////////////////
-      
-      - name: set dynamic target branch name
-        # "${{env.TARGET_BRANCH_NAME}}" is the name of the original branch
-        run: echo "TARGET_BRANCH_NAME=Bundled-${{env.BRANCH_NAME}}" >> $GITHUB_ENV
-        if: ${{env.USE_DYNAMIC_TARGET_NAME}}
-      
-      
+        
+      - id: set-name
+        run: echo "::set-output name=target::{false:${{STATIC_TARGET_NAME}},true:${{format(env.DYNAMIC_TARGET_NAME,env.BRANCH_NAME)}}}"
+        
+  build:
+    needs: Set_target_branch
+    runs-on: windows-latest
+    env:
+      TARGET_BRANCH_NAME: ${{needs.Set_target_branch.outputs.target_name}}
+
+    steps:
       - name: setup Python
         uses: actions/setup-python@v2
         with:
@@ -49,7 +49,7 @@ jobs:
       - name: checkout target branch
         uses: actions/checkout@v2
         with:
-          ref: $TARGET_BRANCH_NAME
+          ref: ${{env.TARGET_BRANCH_NAME}}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
