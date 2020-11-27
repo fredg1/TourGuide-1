@@ -15,7 +15,7 @@ on:
 env:
   # To have the branch name depend on the ref's name, set USE_STATIC_TARGET_NAME to 'true', and (if you want) modify the end of line 37
   TARGET_BRANCH_NAME: Pre-Release
-  USE_STATIC_TARGET_NAME: false
+  USE_STATIC_TARGET_NAME: true
 
 jobs:
   build:
