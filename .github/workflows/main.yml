@@ -13,39 +13,42 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      #- uses: actions/setup-node@v1
-      #- run: npm init -y
-      #- run: npm install @actions/core
-      #- run: npm install @actions/github
-      
       - name: setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
+      - id: info gathering
+        shell: python
+        run: |
+          import os
+          print("current dir: " + os.getcwd())
+          print(os.listdir())
+          
+      - id: more info
+        run: |
+          echo "GITHUB_WORKSPACE is ${{GITHUB_WORKSPACE}}"
+          echo "HOME is ${{HOME}}"
+          
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        
       - id: bundle
         name: Forward output
-        #uses: ./.github/actions
         shell: python
         run: |
           import os
           import sys
-          # Get out of the '.github' folder
+          # Get out of the '.github' folder (apparently not even needed since execution seems to start on the root folder, but, eh, just in case...)
           while '.github' in os.getcwd(): os.chdir('..')
           
           sys.path.append(os.getcwd())
-          print("current dir: " + os.getcwd())
-          print(os.listdir())
           import Bundle_ASH_script
           
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
           Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'Bundled_TourGuide.ash', 'Source')
           
-          print("current dir: " + os.getcwd())
           print(os.listdir())
-      #- run: echo "The time was ${{ steps.bundle.outputs.compiled_output }}"
   #push_to_branch:
     #needs: build
     #runs-on: windows-lastest
