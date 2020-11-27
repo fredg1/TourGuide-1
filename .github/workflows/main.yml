@@ -25,14 +25,13 @@ jobs:
           print("current dir: " + os.getcwd())
           print(os.listdir())
           
-      - id: more info
-        run: echo "HOME is ${{HOME}}"
-          
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
         
-      - id: even more info
-        run: echo "GITHUB_WORKSPACE is ${{GITHUB_WORKSPACE}}"
+      - id: more info
+        run: |
+          echo "GITHUB_WORKSPACE is ${{GITHUB_WORKSPACE}}"
+          echo "HOME is ${{HOME}}"
         
       - id: bundle
         name: Forward output
