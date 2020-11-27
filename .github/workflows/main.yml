@@ -16,7 +16,6 @@ env:
   # To have the branch name depend on the origin branch or tag's name instead, set USE_DYNAMIC_TARGET_NAME to 'true', and (if you want) modify the end of line 36
   BRANCH_NAME: Pre-Release
   USE_DYNAMIC_TARGET_NAME: true
-  DYNAMIC_TARGET_NAME: Bundled-${{env.BRANCH_NAME}}
 
 jobs:
   build:
@@ -35,7 +34,7 @@ jobs:
       
       - name: set dynamic target branch name
         # "${{env.TARGET_BRANCH_NAME}}" is the name of the original branch
-        run: echo "NEW_TARGET_BRANCH_NAME=Bundled-${{env.BRANCH_NAME}}" >> $GITHUB_ENV
+        run: echo "TARGET_BRANCH_NAME=Bundled-${{env.BRANCH_NAME}}" >> $GITHUB_ENV
         if: ${{env.USE_DYNAMIC_TARGET_NAME}}
       
       
