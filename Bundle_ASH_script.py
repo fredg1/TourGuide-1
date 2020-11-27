@@ -41,7 +41,7 @@ import os
 debug = False
 
 #Safety measure. Will not do anything if path_to_result already exists. Change to False to allow overwriting
-create_new_file_only = True
+create_new_file_only = False
 
 def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = []):
   with open(path_to_folder + path_to_file, mode='r', encoding='UTF-8') as ash_file:
