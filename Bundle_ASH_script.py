@@ -171,11 +171,13 @@ def bundle(path_to_file,path_to_folder,resulting_file = """""",imported_files = 
 
 
 def bundle_and_write(path_to_file,path_to_result,path_to_folder = ''):
-  open_mode = 'xw'
-  if create_new_file_only:
-    open_mode = 'x'
+  if not create_new_file_only:
+    try:
+      os.remove(path_to_result)
+    except FileNotFoundError:
+      pass
 
-  with open(path_to_result, mode=open_mode, encoding='UTF-8') as bundled_file:
+  with open(path_to_result, mode='x', encoding='UTF-8') as bundled_file:
     if path_to_folder != '' and not path_to_folder.endswith('/') and not path_to_folder.endswith('\\'):
       path_to_folder += '/'
 
