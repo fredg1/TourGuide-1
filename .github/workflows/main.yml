@@ -30,8 +30,8 @@ jobs:
         
       - id: more info
         run: |
-          echo "GITHUB_WORKSPACE is ${{GITHUB_WORKSPACE}}"
-          echo "HOME is ${{HOME}}"
+          echo $GITHUB_WORKSPACE
+          echo $HOME
         
       - id: bundle
         name: Forward output
