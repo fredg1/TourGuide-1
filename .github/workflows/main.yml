@@ -23,7 +23,7 @@ jobs:
   Set_target_branch:
     runs-on: windows-latest
     outputs:
-      target_name: ${{ steps.set-name.outputs.target }}.${{env.USE_DYNAMIC_TARGET_NAME}}
+      target_name: ${{ fromJSON( steps.set-name.outputs.target ).( env.USE_DYNAMIC_TARGET_NAME ) }}
     steps:
       - name: Get branch name
         uses: nelonoel/branch-name@v1.0.1
