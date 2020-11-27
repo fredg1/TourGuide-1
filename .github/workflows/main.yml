@@ -30,7 +30,7 @@ jobs:
         uses: nelonoel/branch-name@v1.0.1
         
       - id: set-name-object
-        run: echo "::set-output name=json_string::{\"false\":${{ env.STATIC_TARGET_NAME }},\"true\":${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}}"
+        run: echo "::set-output name=json_string::{"false":${{ env.STATIC_TARGET_NAME }},"true":${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}}"
       - name: test
         env:
           JSON_object: ${{ fromJSON( steps.set-name-object.outputs.json_string ) }}
