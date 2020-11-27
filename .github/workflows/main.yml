@@ -34,27 +34,87 @@ jobs:
         
       - name: checkout current branch
         uses: actions/checkout@v2
-        
+      
+      # checkout target branch
       - name: checkout target branch static
+        id: static_get
+        if: ${{ !env.USE_DYNAMIC_TARGET_NAME }}
+        uses: actions/checkout@v2
+        continue-on-error: true
+        with:
+          ref: ${{ env.STATIC_TARGET_NAME }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      - name: checkout target branch dynamic
+        id: dynamic_get
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME }}
+        uses: actions/checkout@v2
+        continue-on-error: true
+        with:
+          ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+      
+      # target branch doesn't exist; create it
+      - name: create target branch static
+        id: static_create
+        if: ${{ steps.static_get.outcome == failure }}
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ env.STATIC_TARGET_NAME }}
+      - name: create target branch dynamic
+        id: dynamic_create
+        if: ${{ steps.dynamic_get.outcome == failure }}
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
+      
+      # NOW checkout the newly-made target branch
+      - name: checkout created target branch static
+        id: static_get_created
+        if: ${{ steps.static_create.outcome == success }}
         uses: actions/checkout@v2
         with:
           ref: ${{ env.STATIC_TARGET_NAME }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
-        if: ${{ !env.USE_DYNAMIC_TARGET_NAME }}
-      - name: checkout target branch dynamic
+      - name: checkout created target branch dynamic
+        id: dynamic_get_created
+        if: ${{ steps.dynamic_create.outcome == success }}
         uses: actions/checkout@v2
         with:
           ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
           path: target_branch
           persist-credentials: false
           fetch-depth: 0
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME }}
-        
-      - name: more info
+      
+      # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
+      - name: clean created branch
+        id: clean_created
+        if: ${{ steps.static_get_created.outcome == success || steps.dynamic_get_created.outcome == success }}
+        working-directory: ./target_branch
+        shell: python
         run: |
-          echo "$GITHUB_WORKSPACE"
+          import os
+          import shutil
+          print(os.listdir())
+          
+          with os.scandir() as cur_dir:
+            for dir_entry in cur_dir:
+              if dir_entry.name != '.git':
+                if dir_entry.is_dir(follow_symlinks=False):
+                  shutil.rmtree(path=dir_entry.name)
+                else:
+                  os.remove(path=dir_entry.name)
+          print(os.listdir())
+        
         
       - name: Forward output
         shell: python
