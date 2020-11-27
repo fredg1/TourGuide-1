@@ -29,7 +29,7 @@ jobs:
         uses: nelonoel/branch-name@v1.0.1
         
       - id: set-name
-        run: echo "::set-output name=target::{false:${{STATIC_TARGET_NAME}},true:${{format(env.DYNAMIC_TARGET_NAME,env.BRANCH_NAME)}}}"
+        run: echo "::set-output name=target::{false:${{env.STATIC_TARGET_NAME}},true:${{format(env.DYNAMIC_TARGET_NAME,env.BRANCH_NAME)}}}"
         
   build:
     needs: Set_target_branch
