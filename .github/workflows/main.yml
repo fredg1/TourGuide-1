@@ -60,7 +60,7 @@ jobs:
       # target branch doesn't exist; create it
       - name: create target branch static
         id: static_create
-        if: ${{ steps.static_get.outcome == failure }}
+        if: ${{ steps.static_get.outcome == 'failure' }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           branch: ${{ env.STATIC_TARGET_NAME }}
       - name: create target branch dynamic
         id: dynamic_create
-        if: ${{ steps.dynamic_get.outcome == failure }}
+        if: ${{ steps.dynamic_get.outcome == 'failure' }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
       # NOW checkout the newly-made target branch
       - name: checkout created target branch static
         id: static_get_created
-        if: ${{ steps.static_create.outcome == success }}
+        if: ${{ steps.static_create.outcome == 'success' }}
         uses: actions/checkout@v2
         with:
           ref: ${{ env.STATIC_TARGET_NAME }}
@@ -87,7 +87,7 @@ jobs:
           fetch-depth: 0
       - name: checkout created target branch dynamic
         id: dynamic_get_created
-        if: ${{ steps.dynamic_create.outcome == success }}
+        if: ${{ steps.dynamic_create.outcome == 'success' }}
         uses: actions/checkout@v2
         with:
           ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
@@ -98,7 +98,7 @@ jobs:
       # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
       - name: clean created branch
         id: clean_created
-        if: ${{ steps.static_get_created.outcome == success || steps.dynamic_get_created.outcome == success }}
+        if: ${{ steps.static_get_created.outcome == 'success' || steps.dynamic_get_created.outcome == 'success' }}
         working-directory: ./target_branch
         shell: python
         run: |
@@ -116,18 +116,46 @@ jobs:
           print(os.listdir())
         
         
-      - name: Forward output
+      - name: Forward bundle output to target branch
         shell: python
         run: |
           import os
           import sys
-          # Get out of the '.github' folder (apparently not even needed since execution seems to start on the root folder, but, eh, just in case...)
-          while '.github' in os.getcwd(): os.chdir('..')
           
           sys.path.append(os.getcwd())
           import Bundle_ASH_script
           
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
-          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay_TourGuide.ash', 'Source')
+          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay/relay_TourGuide.ash', 'Source')
           
           print(os.listdir())
+      
+      # copy any non-ASH file in target_branch
+      - name: Add non-ash in Source
+        shell: python
+        run: |
+          import os
+          
+          def parse_folder(cur_dir, current_path = ''):
+            for dir_entry in cur_dir:
+              if dir_entry.is_symlink():
+                continue
+              if dir_entry.is_dir():
+                next_path = current_path
+                if next_path != '':
+                  next_path += '/'
+                next_path += dir_entry.name
+                with os.scandir('Source/' + next_path) as next_dir:
+                  parse_folder(next_dir, next_path)
+              elif dir_entry.is_file():
+                this_path = current_path + '/' + dir_entry.name
+                os.renames('Source/' + this_path, 'target_branch/' + this_path)
+                
+                
+                print(os.listdir('target_branch/' + current_path))
+          
+          with os.scandir('Source') as source_dir:
+            parse_folder(cur_dir = source_dir)
+          
+          print(os.listdir('target_branch'))
+            
