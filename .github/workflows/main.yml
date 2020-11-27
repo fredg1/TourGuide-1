@@ -60,7 +60,7 @@ jobs:
       # target branch doesn't exist; create it
       - name: create target branch static
         id: static_create
-        if: ${{ steps.static_get.outcome == failure }}
+        if: ${{ steps.static_get.outcome == "failure" }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,7 +68,7 @@ jobs:
           branch: ${{ env.STATIC_TARGET_NAME }}
       - name: create target branch dynamic
         id: dynamic_create
-        if: ${{ steps.dynamic_get.outcome == failure }}
+        if: ${{ steps.dynamic_get.outcome == "failure" }}
         uses: peterjgrainger/action-create-branch@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
       # NOW checkout the newly-made target branch
       - name: checkout created target branch static
         id: static_get_created
-        if: ${{ steps.static_create.outcome == success }}
+        if: ${{ steps.static_create.outcome == "success" }}
         uses: actions/checkout@v2
         with:
           ref: ${{ env.STATIC_TARGET_NAME }}
@@ -87,7 +87,7 @@ jobs:
           fetch-depth: 0
       - name: checkout created target branch dynamic
         id: dynamic_get_created
-        if: ${{ steps.dynamic_create.outcome == success }}
+        if: ${{ steps.dynamic_create.outcome == "success" }}
         uses: actions/checkout@v2
         with:
           ref: ${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}
@@ -98,7 +98,7 @@ jobs:
       # if it's a newly created branch (which was based on the current one), then nothing in it can be assumed to be important. Wipe it all (well... not .git).
       - name: clean created branch
         id: clean_created
-        if: ${{ steps.static_get_created.outcome == success || steps.dynamic_get_created.outcome == success }}
+        if: ${{ steps.static_get_created.outcome == "success" || steps.dynamic_get_created.outcome == "success" }}
         working-directory: ./target_branch
         shell: python
         run: |
