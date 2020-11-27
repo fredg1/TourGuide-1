@@ -1,40 +1,64 @@
 name: bundle Guide
+# By https://github.com/fredg1
 
 on:
   workflow_dispatch:
+  # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags for more info about this if you want to modify it
+  # (for example, if you wish to make it so that any branch can trigger this workflow)
   push:
     branches:
-      - master
+      - 'master'
     paths:
-      - '**.ash'
+      - 'Source/relay/**.ash'
+      - 'Source/relay/**.js'
+
+env:
+  # To have the branch name depend on the ref's name, set USE_STATIC_TARGET_NAME to 'true', and (if you want) modify the end of line 37
+  TARGET_BRANCH_NAME: Pre-Release
+  USE_STATIC_TARGET_NAME: false
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      
+      # //////////////////////////
+      # /  Change this to modify /
+      # /  the name of the       /
+      # /  target branch         /
+      # //////////////////////////
+      
+      - name: set target branch name
+        id: target_name
+        # "${{env.TARGET_BRANCH_NAME}}" is the name of the original branch
+        run: echo '::set-output name=TARGET_BRANCH_NAME::Bundled_${{env.TARGET_BRANCH_NAME}}'
+        if: ${{env.USE_STATIC_TARGET_NAME}}
+      
+      
       - name: setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-
-      - id: info_gathering
-        shell: python
-        run: |
-          import os
-          print("current dir: " + os.getcwd())
-          print(os.listdir())
           
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: checkout current branch
+        uses: actions/checkout@v2
         
-      - id: more_info
+      - name: checkout target branch
+        uses: actions/checkout@v2
+        with:
+          ref: $TARGET_BRANCH_NAME
+          path: target_branch
+          persist-credentials: false
+          fetch-depth: 0
+        
+      - name: more info
         run: |
           echo $GITHUB_WORKSPACE
-          echo $HOME
         
-      - id: bundle
-        name: Forward output
+      - name: Forward output
         shell: python
         run: |
           import os
@@ -46,9 +70,6 @@ jobs:
           import Bundle_ASH_script
           
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
-          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'Bundled_TourGuide.ash', 'Source')
+          Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay_TourGuide.ash', 'Source')
           
           print(os.listdir())
-  #push_to_branch:
-    #needs: build
-    #runs-on: windows-lastest
