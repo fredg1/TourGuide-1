@@ -38,7 +38,7 @@ jobs:
       # checkout target branch
       - name: checkout target branch static
         id: static_get
-        if: ${{ !env.USE_DYNAMIC_TARGET_NAME }}
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
         uses: actions/checkout@v2
         continue-on-error: true
         with:
@@ -48,7 +48,7 @@ jobs:
           fetch-depth: 0
       - name: checkout target branch dynamic
         id: dynamic_get
-        if: ${{ env.USE_DYNAMIC_TARGET_NAME }}
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
         uses: actions/checkout@v2
         continue-on-error: true
         with:
@@ -167,6 +167,7 @@ jobs:
           git add --all -v *
           git status *
           git commit -m "Add changes" -a
+          print("${{ github.ref }}")
         
       - name: push changes to target
         uses: ad-m/github-push-action@master
