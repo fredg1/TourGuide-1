@@ -168,7 +168,7 @@ jobs:
           git add --all -v *
           git status *
           git commit -m "Add changes" -a
-          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags --dry-run
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags --dry-run
         
       - name: commit changes to dynamic target
         working-directory: ./target_branch
@@ -179,4 +179,4 @@ jobs:
           git add --all -v *
           git status *
           git commit -m "Add changes" -a
-          git push "https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags --dry-run
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags --dry-run
