@@ -159,3 +159,17 @@ jobs:
           
           print(os.listdir('target_branch'))
             
+      - name: commit changes to target
+        working-directory: ./target_branch
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Add changes" -a
+        
+      - name: push changes to target
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          directory: ./target_branch
+          branch: ${{ github.ref }}
+          #force: true
