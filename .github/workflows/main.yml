@@ -17,8 +17,7 @@ on: # customize at will
       - 'Source/relay/**.ash'
       - 'Source/relay/**.js'
     # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
-    paths-ignore:
-      - '.github/**'
+      - '!.github/**'
 
 env:
   # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
