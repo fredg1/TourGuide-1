@@ -145,8 +145,10 @@ jobs:
                   parse_folder(next_dir, next_path)
               elif dir_entry.is_file() and not dir_entry.name.endswith('.ash'):
                 this_path = current_path + '/' + dir_entry.name
+                print('Grabbing ' + this_path + ' ...')
+                if os.path.exists( this_path ):
+                  os.remove( this_path )
                 os.renames('Source/' + this_path, 'target_branch/' + this_path)
-                print('Grabbing ' + dir_entry.name + ' ...')
           
           with os.scandir('Source') as source_dir:
             parse_folder(cur_dir = source_dir)
