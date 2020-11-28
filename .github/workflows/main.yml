@@ -104,7 +104,6 @@ jobs:
         run: |
           import os
           import shutil
-          print(os.listdir())
           
           with os.scandir() as cur_dir:
             for dir_entry in cur_dir:
@@ -113,7 +112,6 @@ jobs:
                   shutil.rmtree(path=dir_entry.name)
                 else:
                   os.remove(path=dir_entry.name)
-          print(os.listdir())
         
         
       - name: Forward bundle output to target branch
@@ -127,8 +125,6 @@ jobs:
           
           # The script that bundles the target script. First argument is the target script. Second argument is the path to reach the file to create/put the result in. Third argument (optional) is the path to reach the "mafia folder".
           Bundle_ASH_script.bundle_and_write('relay/relay_TourGuide.ash', 'target_branch/relay/relay_TourGuide.ash', 'Source')
-          
-          print(os.listdir())
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
@@ -150,14 +146,10 @@ jobs:
               elif dir_entry.is_file() and not dir_entry.name.endswith('.ash'):
                 this_path = current_path + '/' + dir_entry.name
                 os.renames('Source/' + this_path, 'target_branch/' + this_path)
-                
-                
-                print(os.listdir('target_branch/' + current_path))
+                print('Grabbing ' + dir_entry.name + ' ...')
           
           with os.scandir('Source') as source_dir:
             parse_folder(cur_dir = source_dir)
-          
-          print(os.listdir('target_branch'))
             
       - name: commit changes to static target
         working-directory: ./target_branch
@@ -166,8 +158,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add --all -v *
-          git status *
-          git commit -m "Add changes" -a
+          git commit -m "Import changes from master" -a
           git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags
         
       - name: commit changes to dynamic target
@@ -177,6 +168,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add --all -v *
-          git status *
           git commit -m "Add changes" -a
           git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags
