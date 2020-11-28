@@ -31,8 +31,32 @@ env:
 # Anything past this point shouldn't need to be modified.
 
 jobs:
+  set-target-branch:
+    runs-on: windows-latest
+    #outputs:
+      #target-branch: ${{ steps.set-target.outputs.target }}
+    steps:
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      
+      - id: set-target
+        run: |
+          if ( "${{ env.USE_DYNAMIC_TARGET_NAME }}" -eq "true" ) {
+            echo "TARGET_BRANCH=${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}" >> $GITHUB_ENV
+          } else {
+            echo "TARGET_BRANCH=${{ env.STATIC_TARGET_NAME }}" >> $GITHUB_ENV
+          }
+      
+  test:
+    runs-on: windows-latest
+    needs: [set-target-branch]
+    steps:
+      - name: test printing TARGET_BRANCH
+        run: echo "${{ env.TARGET_BRANCH }}"
+  
   build:
     runs-on: windows-latest
+    needs: [set-target-branch]
 
     steps:
       - name: setup Python
