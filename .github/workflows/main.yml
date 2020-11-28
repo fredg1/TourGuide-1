@@ -47,10 +47,6 @@ jobs:
             echo "TARGET_BRANCH=${{ env.STATIC_TARGET_NAME }}" >> $GITHUB_ENV
           }
       
-  test:
-    runs-on: windows-latest
-    needs: [set-target-branch]
-    steps:
       - name: test printing TARGET_BRANCH
         run: echo "${{ env.TARGET_BRANCH }}"
   
