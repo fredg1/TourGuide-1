@@ -147,7 +147,7 @@ jobs:
                 next_path += dir_entry.name
                 with os.scandir('Source/' + next_path) as next_dir:
                   parse_folder(next_dir, next_path)
-              elif dir_entry.is_file():
+              elif dir_entry.is_file() and not dir_entry.endswith('.ash'):
                 this_path = current_path + '/' + dir_entry.name
                 os.renames('Source/' + this_path, 'target_branch/' + this_path)
                 
