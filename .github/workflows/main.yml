@@ -159,21 +159,24 @@ jobs:
           
           print(os.listdir('target_branch'))
             
-      - name: commit changes to target
+      - name: commit changes to static target
         working-directory: ./target_branch
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME != 'true' }}
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add --all -v *
           git status *
           git commit -m "Add changes" -a
-          print("${{ github.ref }}")
+          git push "https://${{ GITHUB_ACTOR }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ GITHUB_REPOSITORY }}.git" HEAD:refs/heads/${{ env.STATIC_TARGET_NAME }} --follow-tags --tags --dry-run
         
-      - name: push changes to target
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          directory: ./target_branch
-          branch: ${{ github.ref }}
-          #force: true
-        if: ${{false}}
+      - name: commit changes to dynamic target
+        working-directory: ./target_branch
+        if: ${{ env.USE_DYNAMIC_TARGET_NAME == 'true' }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add --all -v *
+          git status *
+          git commit -m "Add changes" -a
+          git push "https://${{ GITHUB_ACTOR }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ GITHUB_REPOSITORY }}.git" HEAD:refs/heads/${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }} --follow-tags --tags --dry-run
