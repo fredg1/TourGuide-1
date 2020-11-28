@@ -16,6 +16,9 @@ on: # customize at will
     paths:
       - 'Source/relay/**.ash'
       - 'Source/relay/**.js'
+    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
+    paths-ignore:
+      - '.github/**'
 
 env:
   # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
@@ -23,6 +26,10 @@ env:
   STATIC_TARGET_NAME: 'Pre-Release'
   # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
+
+
+
+# Anything past this point shouldn't need to be modified.
 
 jobs:
   build:
