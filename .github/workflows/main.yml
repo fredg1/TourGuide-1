@@ -6,7 +6,7 @@ env:
   
   # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
   # (doesn't need to be the name of an existing branch. Will create one if needed)
-  USE_DYNAMIC_TARGET_NAME: 'true'
+  USE_DYNAMIC_TARGET_NAME: 'false'
   STATIC_TARGET_NAME: 'Pre-Release'
   # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
   DYNAMIC_TARGET_NAME: 'Bundled-{0}'
@@ -22,7 +22,7 @@ env:
   
   # If this folder already exists on the target branch, IT'S CONTENT WILL BE ERASED.
   # Stuff outside of it won't.
-  TARGET_PATH_TO_MAFIA: 'Source'
+  TARGET_PATH_TO_MAFIA: ''
   
   
   
@@ -38,7 +38,7 @@ env:
   # The scripts to bundle
   ASH_SCRIPT_SOURCES: 'relay/relay_TourGuide.ash'
   # Their (RESPECTIVE; order matters) destinations
-  ASH_SCRIPT_DESTINATIONS: 'scripts/longnameforfun/not_relay_TourTest.ash'
+  ASH_SCRIPT_DESTINATIONS: 'relay/relay_TourGuide.ash'
 
 
 
@@ -49,7 +49,7 @@ on: # customize at will
   # (for example, if you wish to make it so that any branch can trigger this workflow)
   push:
     branches:
-      - '**'
+      - 'master'
     paths:
       # MAKE SURE THIS IS UP-TO-DATE/CORRECT (it's impossible to query env. variables at this point).
       - 'Source/**.ash'
