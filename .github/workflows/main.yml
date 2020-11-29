@@ -163,10 +163,10 @@ jobs:
           source_scripts = '${{ env.ASH_SCRIPT_SOURCES }}'
           destinations = '${{ env.ASH_SCRIPT_DESTINATIONS }}'
           
-          if len(source_scripts) != len(destinations)
+          if len(source_scripts) != len(destinations):
             raise Exception("ASH_SCRIPT_SOURCES and ASH_SCRIPT_DESTINATIONS aren't properly paired")
           
-          for i in range( len( source_scripts ) )
+          for i in range( len( source_scripts ) ):
             # The script that bundles the target script.
             # First argument is the source script.
             source_script = source_scripts[i]
