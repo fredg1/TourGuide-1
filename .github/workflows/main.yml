@@ -46,9 +46,6 @@ jobs:
           } else {
             echo "::set-output name=target::${{ env.STATIC_TARGET_NAME }}"
           }
-      
-      - name: test printing TARGET_BRANCH
-        run: echo "${{ env.TARGET_BRANCH }}"
   
   build:
     runs-on: windows-latest
