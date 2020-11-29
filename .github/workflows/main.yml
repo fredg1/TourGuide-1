@@ -136,13 +136,18 @@ jobs:
           import os
           import shutil
           
-          with os.scandir('${{ env.TARGET_PATH_TO_MAFIA }}') as cur_dir:
+          target_base = '${{ env.TARGET_PATH_TO_MAFIA }}'
+          if not os.path.exists( target_base ):
+            os.makedirs( target_base )
+          
+          with os.scandir(target_base) as cur_dir:
             for dir_entry in cur_dir:
               if dir_entry.name != '.git':
+                path_to_entry = os.path.join(target_base, dir_entry.name)
                 if dir_entry.is_dir(follow_symlinks=False):
-                  shutil.rmtree(path=dir_entry.name)
+                  shutil.rmtree(path=path_to_entry)
                 else:
-                  os.remove(path=dir_entry.name)
+                  os.remove(path=path_to_entry)
         
         
       - name: Forward bundle output to target branch
