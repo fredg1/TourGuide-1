@@ -31,17 +31,14 @@ env:
   
   
   
-  # (relative) path and name of the ASH scripts you want to bundle, and their new names and (relative) destinations.
+  # comma-separated list of (relative) path and name of the ASH scripts you want to bundle, and their new names and (relative) destinations.
   # Paths need to be relative to the "mafia folder".
-  # Need to be written as python tuples, like so:
-    # '("a/b.ash","c/d/e/f.ash","g.ash","h/i/j/k/l/m.ash")'
-    # important to use SINGLE quotes for the whole string, and DOUBLE quotes for the inner strings
   # Any .ash script not in this list won't be transferred, so if you have scripts that don't have imports, but want them in the result, include them here anyway
   
   # The scripts to bundle
-  ASH_SCRIPT_SOURCES: '("relay/relay_TourGuide.ash")'
+  ASH_SCRIPT_SOURCES: 'relay/relay_TourGuide.ash'
   # Their (RESPECTIVE; order matters) destinations
-  ASH_SCRIPT_DESTINATIONS: '("scripts/longnameforfun/not_relay_TourTest.ash")'
+  ASH_SCRIPT_DESTINATIONS: 'scripts/longnameforfun/not_relay_TourTest.ash'
 
 
 
@@ -160,8 +157,8 @@ jobs:
           import Bundle_ASH_script
           
           
-          source_scripts = '${{ env.ASH_SCRIPT_SOURCES }}'
-          destinations = '${{ env.ASH_SCRIPT_DESTINATIONS }}'
+          source_scripts = tuple( map(str, '${{ env.ASH_SCRIPT_SOURCES }}'.split(',') ) )
+          destinations = tuple( map(str, '${{ env.ASH_SCRIPT_DESTINATIONS }}'.split(',') ) )
           
           if len(source_scripts) != len(destinations):
             raise Exception("ASH_SCRIPT_SOURCES and ASH_SCRIPT_DESTINATIONS aren't properly paired")
