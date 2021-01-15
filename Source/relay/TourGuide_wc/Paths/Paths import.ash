@@ -14,7 +14,8 @@ import "relay/TourGuide_wc/Paths/Nuclear Autumn.ash";
 import "relay/TourGuide_wc/Paths/Gelatinous Noob.ash";
 import "relay/TourGuide_wc/Paths/License to Adventure.ash";
 import "relay/TourGuide_wc/Paths/G-Lover.ash";
+import "relay/TourGuide_wc/Paths/Dark Gift.ash";
 import "relay/TourGuide_wc/Paths/Explosions.ash";
 //missing plumber
 import "relay/TourGuide_wc/Paths/Low Key.ash";
-//missing grey goo
+import "relay/TourGuide_wc/Paths/Grey Goo.ash";
