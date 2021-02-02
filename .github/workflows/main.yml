@@ -1,15 +1,17 @@
 name: bundle ASH script(s), and push to new branch
 # By https://github.com/fredg1
 
+# USER MANUAL
+#  This workflow should run by itself without the need for any change.
+#  It's, however, currently tailored to TourGuide.
+#  If you wish to change its behavior (change the name of the target branch, where it places the result in it, or if you wish to use it on a folder + script other than Source + relay/TourGuide.ash), all you need to modify should be in the "env" section down below.
+# I'm working on making this its own action that can be called as many times as needed, on any script, with as much customization as possible, but github is still not done on the feature I'd need for that :/
+
 env:
-  # Branch names.
-  
-  # To have the target branch name use DYNAMIC_TARGET_NAME, set USE_DYNAMIC_TARGET_NAME to 'true'. Will otherwise use STATIC_TARGET_NAME.
-  # (doesn't need to be the name of an existing branch. Will create one if needed)
-  USE_DYNAMIC_TARGET_NAME: 'false'
-  STATIC_TARGET_NAME: 'Pre-Release'
-  # in DYNAMIC_TARGET_NAME, {0} will be replaced by the current branch/tag's actual name
-  DYNAMIC_TARGET_NAME: 'Bundled-{0}'
+  # Branch to checkout under ./target_branch/ . If contains {0}, {0} will be replaced by the source branch's name.
+  # (doesn't need to be the name of an existing branch. Will create one if needed (will be a copy of the source branch))
+  # examples: 'Pre-Release', 'Bundled-{0}', 'my_{0}_2.0' or just '{0}' (not the best idea, though...)
+  TARGET_NAME: 'Bundled-{0}'
   
   
   
@@ -20,7 +22,7 @@ env:
   # Only its content will be transferred to <target_branch>
   SOURCE_PATH_TO_MAFIA: 'Source'
   
-  # If this folder already exists on the target branch, IT'S CONTENT WILL BE ERASED.
+  # If this folder already exists on the target branch, IT'S PREVIOUS CONTENT WILL BE ERASED.
   # Stuff outside of it won't.
   TARGET_PATH_TO_MAFIA: ''
   
@@ -37,65 +39,66 @@ env:
 
 
 
-on: # customize at will
+on:
   workflow_dispatch:
   # for more info about this if you want to modify it, see
   # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
-  # (for example, if you wish to make it so that any branch can trigger this workflow)
+  # and
+  # https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestpaths
   push:
-    branches:
-      - 'master'
     paths:
-      # MAKE SURE THIS IS UP-TO-DATE/CORRECT (it's impossible to query env. variables at this point).
-      - 'Source/**.ash'
-      - 'Source/**.js'
-    # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
-      - '!.github/**'
+      #- '${{ SOURCE_PATH_TO_MAFIA }}/**' # it's impossible to query env. variables at this point, sorry :(
+      - '**'
+      - '!.github/**' # security measure: doesn't trigger if anything in .github was changed (such as the creation, modification or deletion of this very file)
 
 
 
 # Anything past this point shouldn't need to be modified.
 
 jobs:
-  set-target-branch:
-    runs-on: windows-latest
-    outputs:
-      target-branch: ${{ steps.set-target.outputs.target }}
-    steps:
-      - name: Get branch name
-        uses: nelonoel/branch-name@v1.0.1
-      
-      - id: set-target
-        run: |
-          if ( "${{ env.USE_DYNAMIC_TARGET_NAME }}" -eq "true" ) {
-            echo "::set-output name=target::${{ format( env.DYNAMIC_TARGET_NAME, env.BRANCH_NAME ) }}"
-          } else {
-            echo "::set-output name=target::${{ env.STATIC_TARGET_NAME }}"
-          }
-  
   build:
     runs-on: windows-latest
-    needs: [set-target-branch]
 
     steps:
       - name: setup Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-        
-      # checkout source and target branches
+      
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      
+      # Checkout referrer (source) under ./source_branch/
       - name: checkout current branch
         uses: actions/checkout@v2
         with:
-          path: source_branch
+          path: ./source_branch
+      
+      
+      # Parse wanted target name, then checkout under ./target_branch/
+      - name: set desired target branch
+        id: set-target
+        shell: python
+        run: |
+          source = '${{ env.BRANCH_NAME }}'
+          target = '${{ env.TARGET_NAME }}'
+          
+          if target == source:
+            pass
+          elif target == '':
+            target = 'Bundled-' + source
+          elif '{0}' in target:
+            target = target.format( source )
+          
+          print(f'::set-output name=target-branch::{target}')
       
       - name: checkout target branch
         id: target_get
         uses: actions/checkout@v2
         continue-on-error: true
         with:
-          ref: ${{ needs.set-target-branch.outputs.target-branch }}
-          path: target_branch
+          ref: ${{ steps.set-target.outputs.target-branch }}
+          path: ./target_branch
           persist-credentials: false
           fetch-depth: 0
       
@@ -107,7 +110,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: ${{ needs.set-target-branch.outputs.target-branch }}
+          branch: ${{ steps.set-target.outputs.target-branch }}
       
       # NOW checkout the newly-made target branch
       - name: checkout created target branch
@@ -115,10 +118,173 @@ jobs:
         if: ${{ steps.target_create.outcome == 'success' }}
         uses: actions/checkout@v2
         with:
-          ref: ${{ needs.set-target-branch.outputs.target-branch }}
-          path: target_branch
+          ref: ${{ steps.set-target.outputs.target-branch }}
+          path: ./target_branch
           persist-credentials: false
           fetch-depth: 0
+      
+      # If this branch needed to be created, assume the user doesn't want to have this workflow trigger in it
+      # this was way too much work for something so situational/niche... X_X
+      - name: get workflow path
+        id: get-workflow-path
+        if: ${{ steps.target_get_created.outcome == 'success' }}
+        shell: pwsh
+        run: |
+          $Header = @{"Accept" = "application/vnd.github.v3+json"}
+          $uri = "https://api.github.com/repos/${{ github.repository }}/actions/workflows"
+          $Workflows = Invoke-RestMethod -Method GET -Header $Header -uri $uri
+          Foreach ($workflow in $Workflows.workflows)
+          {
+            if ( $workflow.path -eq "${{ github.workflow }}" -or $workflow.name -eq "${{ github.workflow }}" )
+            {
+              $workflow_path = $workflow.path
+              echo "::set-output name=workflow-path::$workflow_path"
+              break
+            }
+          }
+      - name: don't carry workflow
+        if: ${{ steps.get-workflow-path.outcome == 'success' }}
+        working-directory: ./target_branch
+        shell: python
+        run: |
+          import os
+          
+          workflow_file = '${{ steps.get-workflow-path.outputs.workflow-path }}'
+          new_branch_to_exclude = '${{ steps.set-target.outputs.target-branch }}'
+          
+          
+          def removeComment(line: str, start = 0):
+            comment_start = line.find('#', start)
+            if comment_start == -1:
+              return line
+            else:
+              if line[comment_start - 1] == '\\':
+                removeComment( line, comment_start + 1 )
+              else:
+                return line[:comment_start]
+          
+          
+          extra_line_separator_characters = len( os.linesep ) - 1 # may mess us up when we manually move the pointer on Windows (which is \r\n , 2 characters)
+          if os.path.exists( workflow_file ):
+            with open(workflow_file, mode='r+', encoding='UTF-8') as f:
+              in_event_trigger_section = False # whether we reached "on:". Never set back to False; we exit the loop instead
+              in_push_event_trigger = False # whether we reached "push:", and if we're still in it
+              push_event_trigger_indentation = 0 # the indentation of the "push:" block. Used to check when to set in_push_event_trigger back to False, and in case the push: block ends up being empty, as a backup of indentation_after_push
+              push_event_trigger_location = 0 # pointer location after the "push:" block. Used in case the push: block ends up being empty
+              indentation_after_push = 0 # the indentation of the "branches:"/"branches-ignore:" block (or, if we don't see it, the first block inside of "push:" that we see). Used to tell when we left the branches:/branches-ignore: block, and, if that block didn't end up being here, the indentation we'll use to MAKE said block
+              found_branches = False # which, of branches or branches-ignore, we found
+              found_branches_ignore = False # which, of branches or branches-ignore, we found
+              branches_start_location = 0 # pointer location after the "branches:" or "branches-ignore:" block (currently unused)
+              branches_end_location = None # furthest we got the pointer while in_branches was True. We want to add something right after that
+              branches_indentation = 0 # by how much the user indented what's IN their branches:/branches-ignore: scope. They all need the same indentation
+              in_branches = False # whether we reached "branches:" or "branches-ignore:", and if we're still in it
+              branches_lines = [] # list of lines interpreted as being under the "branches:" or "branches-ignore:" scope
+              while True:
+                line = f.readline()
+                # we're looking for:
+                #on: (event_trigger_section)
+                #  [...]
+                #  push: (push_event_trigger)
+                #    [...]
+                #    branches:
+                if line == '':
+                  if in_branches:
+                    branches_end_location = f.tell()
+                  break # end of file
+                elif in_event_trigger_section:
+                  # remove comments from the line
+                  no_commented_line = removeComment( line )
+                  stripped_line = no_commented_line.lstrip()
+                  current_indentation = len( no_commented_line ) - len( stripped_line )
+                  
+                  if stripped_line == '':
+                    if in_branches:
+                      branches_lines.append( line )
+                    continue
+                  
+                  if in_push_event_trigger and current_indentation <= push_event_trigger_indentation:
+                    in_push_event_trigger = False # we left that block
+                  if in_branches and current_indentation <= indentation_after_push and (current_indentation < indentation_after_push or not stripped_line.startswith('-')):
+                    in_branches = False
+                    branches_end_location = f.tell() - ( len( line ) + extra_line_separator_characters )
+                  
+                  if current_indentation == 0:
+                    break # we left the event trigger section
+                  
+                  if stripped_line.startswith('push:') and ( push_event_trigger_indentation == 0 or current_indentation < push_event_trigger_indentation ):
+                    in_push_event_trigger = True
+                    push_event_trigger_indentation = current_indentation
+                    push_event_trigger_location = f.tell()
+                    # also reset all the other variables in case we previously set them in the wrong(???) "push:" block
+                    indentation_after_push = 0
+                    found_branches = False
+                    found_branches_ignore = False
+                    branches_start_location = 0
+                    branches_end_location = None
+                    branches_indentation = 0
+                    in_branches = False
+                    branches_lines = []
+                  elif in_push_event_trigger:
+                    if indentation_after_push == 0:
+                      indentation_after_push = current_indentation # save this for later in case there's no "branches:" tag, and we need to add it ourselves
+                    
+                    if in_branches:
+                      if stripped_line.startswith('-') and branches_indentation == 0:
+                        branches_indentation = current_indentation
+                      branches_lines.append( line )
+                    elif stripped_line.startswith('branches:'):
+                      found_branches = True
+                      branches_start_location = f.tell()
+                      in_branches = True
+                      indentation_after_push = current_indentation
+                    elif stripped_line.startswith('branches-ignore:'):
+                      found_branches_ignore = True
+                      branches_start_location = f.tell()
+                      in_branches = True
+                      indentation_after_push = current_indentation
+                
+                elif line.startswith('on:'):
+                  in_event_trigger_section = True
+              
+              
+              
+              if push_event_trigger_location > 0: # if it's just not there, don't bother creating it
+                rest_of_file = """"""
+                
+                if indentation_after_push == 0: # push: is empty
+                  indentation_after_push = push_event_trigger_indentation * 2
+                
+                if not found_branches and not found_branches_ignore: # need to create one ourselves
+                  f.seek(push_event_trigger_location)
+                  rest_of_file = f.read()
+                  f.seek(push_event_trigger_location)
+                  
+                  most_recently_added_line = ''.rjust( indentation_after_push )
+                  most_recently_added_line += 'branches-ignore:\n'
+                  most_recently_added_line += ''.rjust( indentation_after_push ) + "- '"
+                else:
+                  # trim any lines at the end that are empty lines / only a comment
+                  for x in range(len( branches_lines ), 0, -1):
+                    branches_line = branches_lines[x-1]
+                    if removeComment( branches_line ).lstrip() != '':
+                      break
+                    branches_lines.pop(x)
+                    branches_end_location -= len( branches_line ) + extra_line_separator_characters
+                  
+                  f.seek( branches_end_location )
+                  rest_of_file = f.read()
+                  f.seek( branches_end_location )
+                  
+                  if branches_indentation == 0:
+                    branches_indentation = indentation_after_push
+                  
+                  most_recently_added_line = ''.rjust( branches_indentation ) + "- '"
+                  if found_branches:
+                    most_recently_added_line += '!'
+                
+                most_recently_added_line += new_branch_to_exclude + "'\n"
+                f.write( most_recently_added_line )
+                f.write( rest_of_file )
       
       # Clean mafia folder in target branch
       - name: clean target branch
@@ -189,6 +355,7 @@ jobs:
       
       # copy any non-ASH file in target_branch
       - name: Add non-ash in Source
+        id: parse-rest
         shell: python
         run: |
           import os
@@ -230,9 +397,22 @@ jobs:
           
           if len( unused_ASH_files ) > 0:
             print()
-            print( str( len( unused_ASH_files ) ) + ' unused ASH file(s) found:' )
-            for unused_file in unused_ASH_files:
-              print( '    ' + unused_file )
+            with open('artifact.txt', mode='x', encoding='UTF-8') as f:
+              message = str( len( unused_ASH_files ) ) + ' unused ASH file(s) (not imported by any of the scripts) found:'
+              print( message )
+              f.write( message + '\n' )
+              
+              for unused_file in unused_ASH_files:
+                message = '    ' + unused_file
+                print( message )
+                f.write( message + '\n' )
+      
+      - name: upload unused files message as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: unused files found
+          path: ./artifact.txt
+          if-no-files-found: ignore
       
       - name: commit changes to target
         working-directory: ./target_branch
@@ -241,4 +421,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add --all -v *
           git commit -m "Import changes from ${{ github.ref }}" -a
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ needs.set-target-branch.outputs.target-branch }} --follow-tags --tags
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:refs/heads/${{ steps.set-target.outputs.target-branch }} --follow-tags --tags
