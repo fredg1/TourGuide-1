@@ -81,4 +81,5 @@ import "relay/TourGuide/Items of the Month/Comprehensive Cartography.ash";
 // Missing: box o' ghosts
 
 // 2021
-// Missing: packaged miniature crystal ball
+import "relay/TourGuide/Items of the Month/Miniature Crystal Ball.ash";
+// Missing: emotion chip
