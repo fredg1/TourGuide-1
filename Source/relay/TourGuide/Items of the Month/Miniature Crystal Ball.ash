@@ -1,7 +1,7 @@
 RegisterTaskGenerationFunction("IOTMCrystalBallGenerateTasks");
 void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEntry [int] optional_task_entries, ChecklistEntry [int] future_task_entries)
 {
-    string [int] predictions = get_property("crystalBallPredictions").split_string("|");
+    string [int] predictions = get_property("crystalBallPredictions").split_string("\\|");
 
     if (predictions.count() < 2)
         return;
@@ -23,7 +23,7 @@ void IOTMCrystalBallGenerateTasks(ChecklistEntry [int] task_entries, ChecklistEn
     description.listAppend("Spend a turn elsewhere to reset");
 
     foreach key in predicted_monsters {
-        description.listAppend(respective_locations.to_string() + " : " + predicted_monsters.to_string().HTMLGenerateSpanFont("blue"));
+        description.listAppend(respective_locations[key].to_string() + " : " + predicted_monsters[key].to_string().HTMLGenerateSpanFont("blue"));
     }
 
     task_entries.listAppend(ChecklistEntryMake("__item miniature crystal ball", "", ChecklistSubentryMake("Current predictions", subtitle, description), crystal_equipped ? -11 : -1).ChecklistEntrySetIDTag("Crystal ball prediction"));
