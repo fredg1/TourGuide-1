@@ -1,6 +1,6 @@
 //This script and its support scripts are in the public domain.
 
-since 20653; //the earliest release that supports the changes to torso Awareness
+since 20.6; //the earliest main release that supports the changes to the terrarium that came with the release of the Melodramedary
 //These settings are for development. Don't worry about editing them.
 string __version = "1.9.0";
 
@@ -4111,9 +4111,9 @@ item [int] generateEquipmentForExtraExperienceOnStat(stat desired_stat, boolean 
     //foreach it in experience_percent_modifiers
     foreach it in equipmentWithNumericModifier(numeric_modifier_string)
     {
-    	slot s = it.to_slot();
-        if (s == $slot[shirt] && !($skill[Torso Awareness].have_skill() || $skill[Best Dressed].have_skill()))
-        	continue;
+        slot s = it.to_slot();
+        if (s == $slot[shirt] && !($skill[12].have_skill() || $skill[Best Dressed].have_skill())) // Torso Aware(g)ness
+            continue;
         if (it.available_amount() > 0 && (!require_can_equip_currently || it.can_equip()) && item_slots[it.to_slot()].numeric_modifier(numeric_modifier_string) < it.numeric_modifier(numeric_modifier_string))
         {
             item_slots[it.to_slot()] = it;
@@ -34452,7 +34452,7 @@ void setUpState()
 	__misc_state_string["ballroom song"] = ballroom_song;
 	
 	__misc_state["Torso aware"] = false;
-    if ($skill[Torso Awareness].skill_is_usable() || $skill[Best Dressed].skill_is_usable())
+    if ($skill[12].skill_is_usable() || $skill[Best Dressed].skill_is_usable()) // Torso Aware(g)ness
         __misc_state["Torso aware"] = true;
 	
 	int hipster_fights_used = get_property_int("_hipsterAdv");
@@ -39232,7 +39232,7 @@ void PathBadMoonGenerateChecklists(ChecklistCollection checklist_collection)
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, listMake("STAT2", "STAT1", "STAT3"), "__effect Phorcefullness", "Stat buffs");
     PathBadMoonGenerateCategoryChecklistEntry(adventures_by_category, bad_moon_adventures_entries, elemental_damage_ordering, "__item oversized snowflake", "Elemental damage buffs", listMake("For defeating ghosts."));
     
-    if (!$skill[torso awareness].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable())
+    if (!$skill[12].have_skill() && !haveSeenBadMoonEncounter(44) && $location[the hidden temple].locationAvailable()) // Torso Aware(g)ness
     {
         string [int] description;
         description.listAppend("Spooky forest.");
